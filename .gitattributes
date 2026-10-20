@@ -1,0 +1,3 @@
+# Keep LF everywhere. Biome checks line endings, so CRLF checkouts on Windows
+# would fail `bun run check`.
+* text=auto eol=lf
