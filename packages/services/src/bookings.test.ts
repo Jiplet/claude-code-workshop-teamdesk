@@ -108,4 +108,60 @@ describe("bookings service", () => {
     ).not.toBeNull();
     expect(await bookings.listUpcoming(team.ana.id, at("00:00"))).toEqual([]);
   });
+
+  test("reschedule moves a booking within the same room", async () => {
+    const booking = await bookings.create(
+      team.ana.id,
+      standUp(team.bigRoom.id)
+    );
+
+    const moved = await bookings.reschedule(team.ana.id, booking.id, {
+      endsAt: at("11:30"),
+      startsAt: at("11:00"),
+    });
+
+    expect(moved).toMatchObject({ endsAt: at("11:30"), startsAt: at("11:00") });
+  });
+
+  test("reschedule refuses a slot that clashes with another booking", async () => {
+    await bookings.create(
+      team.ben.id,
+      standUp(team.bigRoom.id, at("11:00"), at("12:00"))
+    );
+    const booking = await bookings.create(
+      team.ana.id,
+      standUp(team.bigRoom.id)
+    );
+
+    await expect(
+      bookings.reschedule(team.ana.id, booking.id, {
+        endsAt: at("11:45"),
+        startsAt: at("11:15"),
+      })
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+  });
+
+  test("bookings on another day do not count towards the daily limit", async () => {
+    const nextDay = (time: string) =>
+      at(time).replace("2026-10-23", "2026-10-24");
+    await bookings.create(
+      team.ana.id,
+      standUp(team.bigRoom.id, at("09:00"), at("09:30"))
+    );
+    await bookings.create(
+      team.ana.id,
+      standUp(team.bigRoom.id, at("10:00"), at("10:30"))
+    );
+    await bookings.create(
+      team.ana.id,
+      standUp(team.bigRoom.id, at("11:00"), at("11:30"))
+    );
+
+    const tomorrow = await bookings.create(
+      team.ana.id,
+      standUp(team.bigRoom.id, nextDay("09:00"), nextDay("09:30"))
+    );
+
+    expect(tomorrow.startsAt).toBe(nextDay("09:00"));
+  });
 });

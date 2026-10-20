@@ -1,6 +1,6 @@
 // Room bookings: who may book what, when. Times are UTC ISO strings and every
 // slot is [startsAt, endsAt), so back-to-back bookings do not clash.
-import type { Database } from "@repo/db";
+import { bookings, type Database, isUniqueViolation } from "@repo/db";
 import {
   cancelBooking,
   findOverlappingBookings,
@@ -8,6 +8,7 @@ import {
   insertBooking,
   listMemberBookings,
   listRoomBookings,
+  updateBookingTimes,
 } from "@repo/db/bookings";
 import { getRoom } from "@repo/db/rooms";
 import {
@@ -15,8 +16,10 @@ import {
   BOOKING_MIN_MINUTES,
   BOOKING_TITLE_MAX_LENGTH,
   type Booking,
+  MAX_BOOKINGS_PER_MEMBER_PER_DAY,
   type Member,
 } from "@repo/db/shared";
+import { and, count, eq, gt, isNull, lt } from "drizzle-orm";
 import { z } from "zod";
 import {
   ConflictError,
@@ -44,6 +47,13 @@ export const createBookingInput = z.object({
 
 export type CreateBookingInput = z.input<typeof createBookingInput>;
 
+export const rescheduleBookingInput = z.object({
+  endsAt: z.iso.datetime(),
+  startsAt: z.iso.datetime(),
+});
+
+export type RescheduleBookingInput = z.input<typeof rescheduleBookingInput>;
+
 export interface BookingsService {
   /** Throws ForbiddenError unless the actor owns the booking or is an admin. */
   cancel: (actorId: string, bookingId: string) => Promise<Booking>;
@@ -52,6 +62,12 @@ export interface BookingsService {
   listForRoom: (roomId: string, day: string) => Promise<Booking[]>;
   /** The member's active bookings that have not ended by `now`. */
   listUpcoming: (memberId: string, now: string) => Promise<Booking[]>;
+  /** Moves a booking to a new slot in the same room. */
+  reschedule: (
+    actorId: string,
+    bookingId: string,
+    input: RescheduleBookingInput
+  ) => Promise<Booking>;
 }
 
 function canManage(actor: Member, booking: Booking): boolean {
@@ -70,6 +86,27 @@ function checkSlot(startsAt: string, endsAt: string): void {
       `Bookings can be at most ${BOOKING_MAX_MINUTES} minutes.`
     );
   }
+}
+
+/** How many active bookings the member starts on the UTC day `iso` falls on. */
+async function countBookingsOnDay(
+  db: Database,
+  memberId: string,
+  iso: string
+): Promise<number> {
+  const { end, start } = utcDayBounds(iso);
+  const [row] = await db
+    .select({ total: count() })
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.memberId, Number(memberId)),
+        isNull(bookings.cancelledAt),
+        gt(bookings.startsAt, start),
+        lt(bookings.startsAt, end)
+      )
+    );
+  return row?.total ?? 0;
 }
 
 export const createBookingsService = (db: Database): BookingsService => ({
@@ -118,18 +155,71 @@ export const createBookingsService = (db: Database): BookingsService => ({
       );
     }
 
-    return await insertBooking(db, {
-      attendees: data.attendees,
-      endsAt,
-      memberId: actorId,
-      roomId: room.id,
-      startsAt,
-      title: data.title,
-    });
+    const sameDay = await countBookingsOnDay(db, actorId, startsAt);
+    if (sameDay >= MAX_BOOKINGS_PER_MEMBER_PER_DAY) {
+      throw new ConflictError(
+        `You can hold at most ${MAX_BOOKINGS_PER_MEMBER_PER_DAY} bookings on one day.`
+      );
+    }
+
+    // The overlap check above can race with another request for the same
+    // slot. The unique index on (room, start) catches that case.
+    try {
+      return insertBooking(db, {
+        attendees: data.attendees,
+        endsAt,
+        memberId: actorId,
+        roomId: room.id,
+        startsAt,
+        title: data.title,
+      });
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new ConflictError(`${room.name} was just booked for that time.`, {
+          cause: error,
+        });
+      }
+      throw error;
+    }
   },
   listForRoom: (roomId, day) => {
     const { end, start } = utcDayBounds(day);
     return listRoomBookings(db, roomId, { from: start, to: end });
   },
   listUpcoming: (memberId, now) => listMemberBookings(db, memberId, now),
+  reschedule: async (actorId, bookingId, input) => {
+    await requireMember(db, actorId);
+    const data = rescheduleBookingInput.parse(input);
+    const booking = await getBooking(db, bookingId);
+    if (!booking || booking.cancelledAt) {
+      throw new NotFoundError("Booking", bookingId);
+    }
+    const member = await requireMember(db, booking.memberId);
+    if (!canManage(member, booking)) {
+      throw new ForbiddenError(
+        "Only the person who booked or an admin can reschedule."
+      );
+    }
+    const startsAt = toUtcIso(data.startsAt);
+    const endsAt = toUtcIso(data.endsAt);
+    checkSlot(startsAt, endsAt);
+
+    const clashes = await findOverlappingBookings(db, {
+      endsAt,
+      excludeId: booking.id,
+      roomId: booking.roomId,
+      startsAt,
+    });
+    if (clashes.length > 0) {
+      throw new ConflictError(
+        "The room is already booked for part of that time."
+      );
+    }
+
+    const moved = await updateBookingTimes(db, bookingId, { endsAt, startsAt });
+    if (!moved) {
+      throw new NotFoundError("Booking", bookingId);
+    }
+    return moved;
+  },
 });
