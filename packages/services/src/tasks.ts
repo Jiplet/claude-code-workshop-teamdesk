@@ -1,11 +1,16 @@
 import type { Database } from "@repo/db";
-import { TASK_TITLE_MAX_LENGTH, type Task } from "@repo/db/shared";
+import {
+  TASK_STATUSES,
+  TASK_TITLE_MAX_LENGTH,
+  type Task,
+} from "@repo/db/shared";
 import {
   completeTask,
   getTask,
   insertTask,
   listTasks,
   setTaskAssignee,
+  setTaskStatus,
 } from "@repo/db/tasks";
 import { z } from "zod";
 import { ForbiddenError, NotFoundError, ValidationError } from "./errors.ts";
@@ -26,6 +31,13 @@ export const createTaskInput = z.object({
 
 export type CreateTaskInput = z.input<typeof createTaskInput>;
 
+export const moveTaskInput = z.object({
+  status: z.enum(TASK_STATUSES),
+  taskId: z.string().min(1),
+});
+
+export type MoveTaskInput = z.input<typeof moveTaskInput>;
+
 export interface TasksService {
   assign: (
     actorId: string,
@@ -41,7 +53,17 @@ export interface TasksService {
     today: string
   ) => Promise<Task>;
   list: (filter?: { assigneeId?: string }) => Promise<Task[]>;
+  /**
+   * Moves a task to a board column. The assignee, the creator or an admin may
+   * move it; anyone may start an unassigned task, which assigns it to them.
+   */
+  move: (actorId: string, input: MoveTaskInput) => Promise<Task>;
 }
+
+const canChange = (actor: { id: string; role: string }, task: Task) =>
+  actor.role === "admin" ||
+  task.createdById === actor.id ||
+  task.assigneeId === actor.id;
 
 export const createTasksService = (db: Database): TasksService => ({
   assign: async (actorId, taskId, assigneeId) => {
@@ -61,11 +83,7 @@ export const createTasksService = (db: Database): TasksService => ({
     if (!task) {
       throw new NotFoundError("Task", taskId);
     }
-    const allowed =
-      actor.role === "admin" ||
-      task.createdById === actor.id ||
-      task.assigneeId === actor.id;
-    if (!allowed) {
+    if (!canChange(actor, task)) {
       throw new ForbiddenError(
         "Only the assignee, the creator or an admin can complete this task."
       );
@@ -90,4 +108,37 @@ export const createTasksService = (db: Database): TasksService => ({
     return await insertTask(db, { ...data, createdById: actorId });
   },
   list: (filter) => listTasks(db, filter),
+  move: async (actorId, input) => {
+    const actor = await requireMember(db, actorId);
+    const parsed = moveTaskInput.safeParse(input);
+    if (!parsed.success) {
+      throw new ValidationError(
+        parsed.error.issues.map((issue) => issue.message).join(" ")
+      );
+    }
+    const { status, taskId } = parsed.data;
+    const task = await getTask(db, taskId);
+    if (!task) {
+      throw new NotFoundError("Task", taskId);
+    }
+    if (task.status === status) {
+      return task;
+    }
+    const pickUp = task.assigneeId === null && status === "in_progress";
+    if (!(pickUp || canChange(actor, task))) {
+      throw new ForbiddenError(
+        "Only the assignee, the creator or an admin can move this task."
+      );
+    }
+    const moved = await setTaskStatus(
+      db,
+      taskId,
+      status,
+      pickUp ? actor.id : undefined
+    );
+    if (!moved) {
+      throw new NotFoundError("Task", taskId);
+    }
+    return moved;
+  },
 });

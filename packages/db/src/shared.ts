@@ -43,6 +43,11 @@ export interface Booking {
   title: string;
 }
 
+/** Board columns, in display order. */
+export const TASK_STATUSES = ["todo", "in_progress", "done"] as const;
+
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+
 export interface Task {
   assigneeId: string | null;
   completedAt: string | null;
@@ -50,6 +55,7 @@ export interface Task {
   createdById: string;
   dueOn: string | null;
   id: string;
+  status: TaskStatus;
   title: string;
 }
 

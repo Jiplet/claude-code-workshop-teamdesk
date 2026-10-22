@@ -1,4 +1,4 @@
-import { createTaskInput } from "@repo/services/tasks";
+import { createTaskInput, moveTaskInput } from "@repo/services/tasks";
 import { z } from "zod";
 import { publicProcedure, router } from "../init.ts";
 
@@ -30,4 +30,9 @@ export const tasksRouter = router({
   list: publicProcedure
     .input(z.object({ assigneeId: z.string().optional() }).optional())
     .query(({ ctx, input }) => ctx.services.tasks.list(input)),
+  move: publicProcedure
+    .input(moveTaskInput.extend({ actorId: z.string() }))
+    .mutation(({ ctx, input: { actorId, ...move } }) =>
+      ctx.services.tasks.move(actorId, move)
+    ),
 });

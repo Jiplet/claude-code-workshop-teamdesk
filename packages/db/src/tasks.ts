@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { type Database, tasks } from "./schema.ts";
-import type { Task } from "./shared.ts";
+import type { Task, TaskStatus } from "./shared.ts";
 
 type TaskRow = typeof tasks.$inferSelect;
 
@@ -12,6 +12,7 @@ function toTask(row: TaskRow): Task {
     createdById: String(row.createdById),
     dueOn: row.dueOn,
     id: String(row.id),
+    status: row.status,
     title: row.title,
   };
 }
@@ -117,8 +118,31 @@ export async function completeTask(
 ): Promise<Task | null> {
   const [row] = await db
     .update(tasks)
-    .set({ completedAt: new Date().toISOString() })
+    .set({ completedAt: new Date().toISOString(), status: "done" })
     .where(and(eq(tasks.id, Number(id)), isNull(tasks.completedAt)))
+    .returning();
+  return row ? toTask(row) : null;
+}
+
+/**
+ * Moves a task to a board column. Done records the completion time; any other
+ * column clears it. Pass `assigneeId` to assign in the same write. Null when
+ * the task is missing.
+ */
+export async function setTaskStatus(
+  db: Database,
+  id: string,
+  status: TaskStatus,
+  assigneeId?: string
+): Promise<Task | null> {
+  const [row] = await db
+    .update(tasks)
+    .set({
+      completedAt: status === "done" ? new Date().toISOString() : null,
+      status,
+      ...(assigneeId === undefined ? {} : { assigneeId: Number(assigneeId) }),
+    })
+    .where(eq(tasks.id, Number(id)))
     .returning();
   return row ? toTask(row) : null;
 }

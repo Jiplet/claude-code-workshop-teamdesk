@@ -86,6 +86,10 @@ export const tasks = sqliteTable("tasks", {
   // Calendar date, YYYY-MM-DD, no time zone.
   dueOn: text("due_on"),
   id: integer("id").primaryKey({ autoIncrement: true }),
+  // Board column: todo, in_progress or done. Kept in step with completedAt.
+  status: text("status", { enum: ["todo", "in_progress", "done"] })
+    .notNull()
+    .default("todo"),
   title: text("title").notNull(),
 });
 
