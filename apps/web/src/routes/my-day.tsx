@@ -1,6 +1,12 @@
 import type { Booking, Room, Task } from "@repo/db/shared";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { type MouseEvent, useCallback, useEffect, useState } from "react";
+import {
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import FormError from "#/components/form-error";
 import MemberPicker from "#/components/member-picker";
 import PageError from "#/components/page-error";
@@ -36,18 +42,26 @@ function MyDayPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  // The member whose day is on screen. The picker switches from the default
+  // member to the saved one right after hydration, so an earlier response can
+  // arrive last; it is dropped rather than shown under the wrong name.
+  const shownMemberId = useRef("");
+
   // The server does not know the browser's timezone, so the day is fetched
   // here rather than in the loader.
   const load = useCallback(async (memberId: string) => {
     const bounds = localDayBounds();
     const result = await getTrpc().myDay.get.query({ memberId, ...bounds });
-    setDay({ ...result, today: bounds.today });
+    if (shownMemberId.current === memberId) {
+      setDay({ ...result, today: bounds.today });
+    }
   }, []);
 
   useEffect(() => {
     if (!actorId) {
       return;
     }
+    shownMemberId.current = actorId;
     setDay(null);
     setError(null);
     load(actorId).catch((err: unknown) =>
