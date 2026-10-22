@@ -3,6 +3,7 @@ import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import BrandHeader from "#/components/brand-header";
 import { TooltipProvider } from "#/components/ui/tooltip";
+import { useSubmitShortcut } from "#/hooks/use-submit-shortcut";
 import Footer from "../components/footer";
 import Header from "../components/header";
 import ThemedToaster from "../components/themed-toaster";
@@ -36,6 +37,7 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  useSubmitShortcut();
   return (
     <html className="light" lang="en" suppressHydrationWarning>
       <head>

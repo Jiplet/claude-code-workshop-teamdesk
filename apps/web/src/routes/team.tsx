@@ -12,6 +12,7 @@ import MinifigHead from "#/components/minifig-head";
 import PageError from "#/components/page-error";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
+import { Kbd, KbdGroup } from "#/components/ui/kbd";
 import {
   NativeSelect,
   NativeSelectOption,
@@ -153,7 +154,12 @@ function TeamPage() {
                 required
                 type="email"
               />
-              <NativeSelect aria-label="Role" defaultValue="member" name="role">
+              <NativeSelect
+                aria-label="Role"
+                className="sm:w-32"
+                defaultValue="member"
+                name="role"
+              >
                 {MEMBER_ROLES.map((role) => (
                   <NativeSelectOption key={role} value={role}>
                     {role}
@@ -186,13 +192,17 @@ function TeamPage() {
             name="body"
             required
           />
-          <Button
-            className="mt-3"
-            disabled={postAnnouncement.pending}
-            type="submit"
-          >
-            {postAnnouncement.pending ? "Posting…" : "Post"}
-          </Button>
+          <div className="mt-3 flex items-center gap-3">
+            <Button disabled={postAnnouncement.pending} type="submit">
+              {postAnnouncement.pending ? "Posting…" : "Post"}
+            </Button>
+            <span className="text-muted-foreground text-xs">
+              or{" "}
+              <KbdGroup>
+                <Kbd>Shift</Kbd>+<Kbd>Enter</Kbd>
+              </KbdGroup>
+            </span>
+          </div>
           <FormError message={postAnnouncement.error} />
         </form>
         <AnnouncementList
