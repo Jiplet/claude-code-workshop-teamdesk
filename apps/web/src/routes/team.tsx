@@ -10,6 +10,7 @@ import FormError from "#/components/form-error";
 import MemberPicker from "#/components/member-picker";
 import MinifigHead from "#/components/minifig-head";
 import PageError from "#/components/page-error";
+import TeamBounce from "#/components/team-bounce";
 import TeamUniverse from "#/components/team-universe";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
@@ -94,7 +95,10 @@ function TeamPage() {
   return (
     <main className="page-wrap px-4 py-12">
       <div className="relative h-80 overflow-hidden rounded-3xl bg-[#05060d] ring-1 ring-white/10 sm:h-96">
-        <TeamUniverse members={members} />
+        <TeamBounce
+          fallback={<TeamUniverse members={members} />}
+          members={members}
+        />
         <section className="pointer-events-none relative flex max-w-md flex-col gap-3 p-6 sm:p-10">
           <p className="m-0 font-semibold text-[#6fb2bd] text-xs uppercase tracking-[0.2em]">
             Teamdesk
