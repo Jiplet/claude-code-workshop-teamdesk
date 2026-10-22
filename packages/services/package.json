@@ -8,6 +8,7 @@
     "./bookings": "./src/bookings.ts",
     "./errors": "./src/errors.ts",
     "./members": "./src/members.ts",
+    "./my-day": "./src/my-day.ts",
     "./notes": "./src/notes.ts",
     "./rooms": "./src/rooms.ts",
     "./tasks": "./src/tasks.ts"

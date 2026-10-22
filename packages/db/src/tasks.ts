@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { type Database, tasks } from "./schema.ts";
 import type { Task } from "./shared.ts";
 
@@ -39,6 +39,27 @@ export async function listTasks(
       desc(tasks.completedAt),
       asc(tasks.id)
     );
+  return rows.map(toTask);
+}
+
+/** Open tasks assigned to a member and due on or before `date`, earliest first. */
+export async function listOpenTasksDueBy(
+  db: Database,
+  assigneeId: string,
+  date: string
+): Promise<Task[]> {
+  const rows = await db
+    .select()
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.assigneeId, Number(assigneeId)),
+        isNull(tasks.completedAt),
+        isNotNull(tasks.dueOn),
+        lte(tasks.dueOn, date)
+      )
+    )
+    .orderBy(asc(tasks.dueOn), asc(tasks.id));
   return rows.map(toTask);
 }
 

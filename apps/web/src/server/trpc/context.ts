@@ -8,6 +8,7 @@ import { createAnnouncementsService } from "@repo/services/announcements";
 import { createAvailabilityService } from "@repo/services/availability";
 import { createBookingsService } from "@repo/services/bookings";
 import { createMembersService } from "@repo/services/members";
+import { createMyDayService } from "@repo/services/my-day";
 import { createNotesService } from "@repo/services/notes";
 import { createRoomsService } from "@repo/services/rooms";
 import { createTasksService } from "@repo/services/tasks";
@@ -19,6 +20,7 @@ const createServices = (db: Database) => ({
   availability: createAvailabilityService(db),
   bookings: createBookingsService(db),
   members: createMembersService(db),
+  myDay: createMyDayService(db),
   notes: createNotesService(db),
   rooms: createRoomsService(db),
   tasks: createTasksService(db),
