@@ -292,6 +292,56 @@ body {
   }
 }
 
+/* About page tile wall: tiles spring into each new angle, a light line
+   sweeps the wall, and the headline's last word rises in behind a mask. */
+.about-tile {
+  transition: transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.about-sweep {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.9) 50%,
+    transparent
+  );
+  box-shadow: 0 0 18px 4px rgba(111, 178, 189, 0.55);
+  animation: about-sweep 5.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.about-word {
+  animation: about-word 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes about-sweep {
+  0% {
+    opacity: 0;
+    transform: translateY(-120px) scaleX(0.1);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-120px) scaleX(1);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(120px) scaleX(1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: translateY(120px) scaleX(0.1);
+  }
+}
+
+@keyframes about-word {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 /* Team page parade: each walker strolls out, pauses, turns and strolls back.
    --stroll, --range and --delay are set per member. Limbs swing in pairs and
    the body bobs once per step. */
@@ -367,8 +417,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .about-tile {
+    transition: none;
+  }
+
   .rise-in,
   .motion-caption,
+  .about-sweep,
+  .about-word,
   .parade-walker,
   .parade-facing,
   .parade-bob,

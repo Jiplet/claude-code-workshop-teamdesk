@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import AboutMotion from "#/components/about-motion";
 
 export const Route = createFileRoute("/about")({
   component: About,
@@ -17,6 +18,9 @@ function About() {
           modern SSR defaults. Use this as a clean foundation, then layer in
           your own routes, styling, and add-ons.
         </p>
+      </section>
+      <section className="rise-in mt-10" style={{ animationDelay: "120ms" }}>
+        <AboutMotion />
       </section>
     </main>
   );
