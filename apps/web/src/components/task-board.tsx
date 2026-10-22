@@ -162,16 +162,16 @@ export default function TaskBoard({
             onDrop={handleDrop}
           >
             <div className={`h-1 ${STATUS_STYLES[status].strip}`} />
-            <header className="flex items-center justify-between px-4 pt-4 pb-3">
-              <h2 className="m-0 flex items-center gap-2 font-semibold text-foreground text-sm">
+            <header className="flex items-center justify-between px-4 pt-5 pb-4">
+              <h2 className="m-0 flex items-center gap-2.5 font-heading text-2xl text-foreground leading-tight">
                 <span
                   aria-hidden="true"
-                  className={`size-2.5 rounded-full ${STATUS_STYLES[status].dot}`}
+                  className={`size-3 rounded-full ${STATUS_STYLES[status].dot}`}
                 />
                 {COLUMN_TITLES[status]}
               </h2>
               <span
-                className={`rounded-full px-2.5 py-0.5 font-semibold text-xs tabular-nums ${STATUS_STYLES[status].count}`}
+                className={`rounded-full px-3 py-0.5 font-semibold text-sm tabular-nums ${STATUS_STYLES[status].count}`}
               >
                 {column.length}
               </span>
