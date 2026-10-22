@@ -1,4 +1,8 @@
-import { createTaskInput, moveTaskInput } from "@repo/services/tasks";
+import {
+  createTaskInput,
+  flagTaskInput,
+  moveTaskInput,
+} from "@repo/services/tasks";
 import { z } from "zod";
 import { publicProcedure, router } from "../init.ts";
 
@@ -26,6 +30,11 @@ export const tasksRouter = router({
     .input(z.object({ actorId: z.string(), task: createTaskInput }))
     .mutation(({ ctx, input }) =>
       ctx.services.tasks.create(input.actorId, input.task, todayUtc())
+    ),
+  flag: publicProcedure
+    .input(flagTaskInput.extend({ actorId: z.string() }))
+    .mutation(({ ctx, input: { actorId, ...flag } }) =>
+      ctx.services.tasks.flag(actorId, flag)
     ),
   list: publicProcedure
     .input(z.object({ assigneeId: z.string().optional() }).optional())

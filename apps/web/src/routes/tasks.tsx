@@ -1,4 +1,8 @@
-import { TASK_TITLE_MAX_LENGTH, type TaskStatus } from "@repo/db/shared";
+import {
+  TASK_TITLE_MAX_LENGTH,
+  type TaskFlag,
+  type TaskStatus,
+} from "@repo/db/shared";
 import { createFileRoute } from "@tanstack/react-router";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import FormError from "#/components/form-error";
@@ -78,6 +82,14 @@ function TasksPage() {
     [actorId, updateTask.run]
   );
 
+  const handleFlag = useCallback(
+    (taskId: string, flag: TaskFlag, value: boolean) =>
+      updateTask.run(() =>
+        getTrpc().tasks.flag.mutate({ actorId, flag, taskId, value })
+      ),
+    [actorId, updateTask.run]
+  );
+
   return (
     <main className="page-wrap px-4 py-12">
       <section className="flex max-w-3xl flex-col gap-4">
@@ -105,7 +117,12 @@ function TasksPage() {
             placeholder="What needs doing?"
             required
           />
-          <NativeSelect aria-label="Assignee" defaultValue="" name="assigneeId">
+          <NativeSelect
+            aria-label="Assignee"
+            className="sm:w-44"
+            defaultValue=""
+            name="assigneeId"
+          >
             <NativeSelectOption value="">Unassigned</NativeSelectOption>
             {members.map((member) => (
               <NativeSelectOption key={member.id} value={member.id}>
@@ -132,6 +149,7 @@ function TasksPage() {
           disabled={updateTask.pending}
           members={members}
           onAssign={handleAssign}
+          onFlag={handleFlag}
           onMove={handleMove}
           tasks={tasks}
           today={today}

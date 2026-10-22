@@ -161,4 +161,69 @@ describe("tasks service", () => {
       tasks.move(team.ana.id, { status: "done", taskId: "999" })
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
+
+  test("new tasks start unflagged", async () => {
+    const task = await tasks.create(team.ana.id, { title: "Plain" }, TODAY);
+
+    expect(task).toMatchObject({ blocked: false, highPriority: false });
+  });
+
+  test("the creator can tick and clear blocked and high priority", async () => {
+    const task = await tasks.create(
+      team.ana.id,
+      { title: "Fix the printer" },
+      TODAY
+    );
+
+    const blocked = await tasks.flag(team.ana.id, {
+      flag: "blocked",
+      taskId: task.id,
+      value: true,
+    });
+    const urgent = await tasks.flag(team.ana.id, {
+      flag: "highPriority",
+      taskId: task.id,
+      value: true,
+    });
+    expect(urgent).toMatchObject({ blocked: true, highPriority: true });
+    expect(blocked.status).toBe(task.status);
+
+    const cleared = await tasks.flag(team.ana.id, {
+      flag: "blocked",
+      taskId: task.id,
+      value: false,
+    });
+    expect(cleared).toMatchObject({ blocked: false, highPriority: true });
+  });
+
+  test("only the assignee, the creator or an admin can flag a task", async () => {
+    const task = await tasks.create(team.ana.id, { title: "Ana's job" }, TODAY);
+
+    await expect(
+      tasks.flag(team.ben.id, { flag: "blocked", taskId: task.id, value: true })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await tasks.assign(team.ana.id, task.id, team.ben.id);
+    expect(
+      (
+        await tasks.flag(team.ben.id, {
+          flag: "blocked",
+          taskId: task.id,
+          value: true,
+        })
+      ).blocked
+    ).toBe(true);
+  });
+
+  test("flag rejects an unknown flag and a missing task", async () => {
+    await expect(
+      tasks.flag(team.ana.id, {
+        flag: "urgent" as "blocked",
+        taskId: "1",
+        value: true,
+      })
+    ).rejects.toMatchObject({ code: "VALIDATION" });
+    await expect(
+      tasks.flag(team.ana.id, { flag: "blocked", taskId: "999", value: true })
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
 });

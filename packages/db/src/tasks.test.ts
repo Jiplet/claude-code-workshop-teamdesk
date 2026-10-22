@@ -7,6 +7,7 @@ import {
   insertTask,
   listTasks,
   setTaskAssignee,
+  setTaskFlag,
 } from "./tasks.ts";
 import { createTestDatabase } from "./testing.ts";
 
@@ -60,5 +61,15 @@ describe("tasks", () => {
     expect(
       (await listTasks(db, { assigneeId: memberId })).map((t) => t.title)
     ).toEqual(["Ship it"]);
+  });
+
+  test("setTaskFlag sets one flag and leaves the other", async () => {
+    const task = await addTask("Fix the printer");
+
+    expect(await setTaskFlag(db, task.id, "highPriority", true)).toMatchObject({
+      blocked: false,
+      highPriority: true,
+    });
+    expect(await setTaskFlag(db, "999", "blocked", true)).toBeNull();
   });
 });

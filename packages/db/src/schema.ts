@@ -78,6 +78,8 @@ export const bookings = sqliteTable(
 
 export const tasks = sqliteTable("tasks", {
   assigneeId: integer("assignee_id").references(() => members.id),
+  // Flags a card on the board; neither changes the column.
+  blocked: integer("blocked", { mode: "boolean" }).notNull().default(false),
   completedAt: text("completed_at"),
   createdAt: text("created_at").notNull(),
   createdById: integer("created_by_id")
@@ -85,6 +87,9 @@ export const tasks = sqliteTable("tasks", {
     .references(() => members.id),
   // Calendar date, YYYY-MM-DD, no time zone.
   dueOn: text("due_on"),
+  highPriority: integer("high_priority", { mode: "boolean" })
+    .notNull()
+    .default(false),
   id: integer("id").primaryKey({ autoIncrement: true }),
   // Board column: todo, in_progress or done. Kept in step with completedAt.
   status: text("status", { enum: ["todo", "in_progress", "done"] })

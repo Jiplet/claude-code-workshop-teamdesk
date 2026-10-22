@@ -1,5 +1,6 @@
 import type { Database } from "@repo/db";
 import {
+  TASK_FLAGS,
   TASK_STATUSES,
   TASK_TITLE_MAX_LENGTH,
   type Task,
@@ -10,6 +11,7 @@ import {
   insertTask,
   listTasks,
   setTaskAssignee,
+  setTaskFlag,
   setTaskStatus,
 } from "@repo/db/tasks";
 import { z } from "zod";
@@ -38,6 +40,14 @@ export const moveTaskInput = z.object({
 
 export type MoveTaskInput = z.input<typeof moveTaskInput>;
 
+export const flagTaskInput = z.object({
+  flag: z.enum(TASK_FLAGS),
+  taskId: z.string().min(1),
+  value: z.boolean(),
+});
+
+export type FlagTaskInput = z.input<typeof flagTaskInput>;
+
 export interface TasksService {
   assign: (
     actorId: string,
@@ -52,6 +62,11 @@ export interface TasksService {
     input: CreateTaskInput,
     today: string
   ) => Promise<Task>;
+  /**
+   * Ticks or clears blocked or high priority. The assignee, the creator or an
+   * admin may flag a task.
+   */
+  flag: (actorId: string, input: FlagTaskInput) => Promise<Task>;
   list: (filter?: { assigneeId?: string }) => Promise<Task[]>;
   /**
    * Moves a task to a board column. The assignee, the creator or an admin may
@@ -106,6 +121,30 @@ export const createTasksService = (db: Database): TasksService => ({
       throw new ValidationError("The due date is in the past.");
     }
     return await insertTask(db, { ...data, createdById: actorId });
+  },
+  flag: async (actorId, input) => {
+    const actor = await requireMember(db, actorId);
+    const parsed = flagTaskInput.safeParse(input);
+    if (!parsed.success) {
+      throw new ValidationError(
+        parsed.error.issues.map((issue) => issue.message).join(" ")
+      );
+    }
+    const { flag, taskId, value } = parsed.data;
+    const task = await getTask(db, taskId);
+    if (!task) {
+      throw new NotFoundError("Task", taskId);
+    }
+    if (!canChange(actor, task)) {
+      throw new ForbiddenError(
+        "Only the assignee, the creator or an admin can flag this task."
+      );
+    }
+    const flagged = await setTaskFlag(db, taskId, flag, value);
+    if (!flagged) {
+      throw new NotFoundError("Task", taskId);
+    }
+    return flagged;
   },
   list: (filter) => listTasks(db, filter),
   move: async (actorId, input) => {

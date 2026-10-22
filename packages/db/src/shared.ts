@@ -48,12 +48,19 @@ export const TASK_STATUSES = ["todo", "in_progress", "done"] as const;
 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
+/** Flags a member can tick on a task card. */
+export const TASK_FLAGS = ["blocked", "highPriority"] as const;
+
+export type TaskFlag = (typeof TASK_FLAGS)[number];
+
 export interface Task {
   assigneeId: string | null;
+  blocked: boolean;
   completedAt: string | null;
   createdAt: string;
   createdById: string;
   dueOn: string | null;
+  highPriority: boolean;
   id: string;
   status: TaskStatus;
   title: string;

@@ -1,16 +1,18 @@
 import { and, asc, desc, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { type Database, tasks } from "./schema.ts";
-import type { Task, TaskStatus } from "./shared.ts";
+import type { Task, TaskFlag, TaskStatus } from "./shared.ts";
 
 type TaskRow = typeof tasks.$inferSelect;
 
 function toTask(row: TaskRow): Task {
   return {
     assigneeId: row.assigneeId === null ? null : String(row.assigneeId),
+    blocked: row.blocked,
     completedAt: row.completedAt,
     createdAt: row.createdAt,
     createdById: String(row.createdById),
     dueOn: row.dueOn,
+    highPriority: row.highPriority,
     id: String(row.id),
     status: row.status,
     title: row.title,
@@ -142,6 +144,21 @@ export async function setTaskStatus(
       status,
       ...(assigneeId === undefined ? {} : { assigneeId: Number(assigneeId) }),
     })
+    .where(eq(tasks.id, Number(id)))
+    .returning();
+  return row ? toTask(row) : null;
+}
+
+/** Sets or clears one flag on a task. Null when the task is missing. */
+export async function setTaskFlag(
+  db: Database,
+  id: string,
+  flag: TaskFlag,
+  value: boolean
+): Promise<Task | null> {
+  const [row] = await db
+    .update(tasks)
+    .set({ [flag]: value })
     .where(eq(tasks.id, Number(id)))
     .returning();
   return row ? toTask(row) : null;
