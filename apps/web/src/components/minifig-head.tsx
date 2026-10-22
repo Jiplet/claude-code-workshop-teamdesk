@@ -22,26 +22,12 @@ const MOUTH_PATHS: Record<Mouth, string> = {
   smirk: "M26 39 C30 41 35 40 39 36",
 };
 
-interface MinifigHeadProps {
-  className?: string;
-  name: string;
-  seed: string;
-}
-
-export default function MinifigHead({
-  className,
-  name,
-  seed,
-}: MinifigHeadProps) {
+/** The head's shapes in a 64 by 64 box, for drawing inside another SVG. */
+export function MinifigHeadShape({ seed }: { seed: string }) {
   const { glasses, hairColour, hairStyle, mouth } = minifigFor(seed);
 
   return (
-    <svg
-      aria-label={`${name} as a minifigure`}
-      className={className}
-      role="img"
-      viewBox="0 0 64 64"
-    >
+    <g>
       <rect fill={SKIN_SHADE} height="7" rx="2" width="18" x="23" y="3" />
       <rect fill={SKIN_SHADE} height="7" rx="2" width="22" x="21" y="52" />
       <rect fill={SKIN} height="44" rx="10" width="40" x="12" y="9" />
@@ -83,6 +69,29 @@ export default function MinifigHead({
       {hairStyle === "bald" ? null : (
         <path d={HAIR_PATHS[hairStyle]} fill={hairColour} />
       )}
+    </g>
+  );
+}
+
+interface MinifigHeadProps {
+  className?: string;
+  name: string;
+  seed: string;
+}
+
+export default function MinifigHead({
+  className,
+  name,
+  seed,
+}: MinifigHeadProps) {
+  return (
+    <svg
+      aria-label={`${name} as a minifigure`}
+      className={className}
+      role="img"
+      viewBox="0 0 64 64"
+    >
+      <MinifigHeadShape seed={seed} />
     </svg>
   );
 }

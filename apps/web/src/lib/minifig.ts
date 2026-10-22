@@ -10,6 +10,15 @@ export const HAIR_COLOURS = [
   "#8a8d91",
 ] as const;
 export const MOUTHS = ["grin", "smile", "smirk"] as const;
+// Torso and leg pairs, after classic minifig outfits.
+export const OUTFITS = [
+  { legs: "#1b1b1b", torso: "#38808c" },
+  { legs: "#2c3e8c", torso: "#c4281c" },
+  { legs: "#5a3a22", torso: "#2f7d4f" },
+  { legs: "#1b1b1b", torso: "#f2a541" },
+  { legs: "#4b4f54", torso: "#7a4fd1" },
+  { legs: "#2c3e8c", torso: "#e8e8e8" },
+] as const;
 
 export type HairStyle = (typeof HAIR_STYLES)[number];
 export type Mouth = (typeof MOUTHS)[number];
@@ -18,7 +27,9 @@ export interface Minifig {
   glasses: boolean;
   hairColour: string;
   hairStyle: HairStyle;
+  legColour: string;
   mouth: Mouth;
+  torsoColour: string;
 }
 
 // A small multiplicative hash: stable, and spreads short ids like "1" and "2"
@@ -36,10 +47,16 @@ const pick = <T>(options: readonly [T, ...T[]], value: number): T =>
 
 export const minifigFor = (seed: string): Minifig => {
   const value = hash(seed);
+  const outfit = pick<{ legs: string; torso: string }>(
+    OUTFITS,
+    Math.floor(value / 11)
+  );
   return {
     glasses: Math.floor(value / 991) % 4 === 0,
     hairColour: pick(HAIR_COLOURS, Math.floor(value / 7)),
     hairStyle: pick(HAIR_STYLES, value),
+    legColour: outfit.legs,
     mouth: pick(MOUTHS, Math.floor(value / 97)),
+    torsoColour: outfit.torso,
   };
 };

@@ -292,9 +292,88 @@ body {
   }
 }
 
+/* Team page parade: each walker strolls out, pauses, turns and strolls back.
+   --stroll, --range and --delay are set per member. Limbs swing in pairs and
+   the body bobs once per step. */
+.parade-walker {
+  position: absolute;
+  animation: parade-stroll var(--stroll) ease-in-out var(--delay) infinite;
+}
+
+.parade-facing {
+  animation: parade-face var(--stroll) step-end var(--delay) infinite;
+}
+
+/* A forward lean shows which way a front-facing figure is walking. */
+.parade-lean {
+  transform: rotate(5deg);
+  transform-origin: 50% 100%;
+}
+
+.parade-bob {
+  animation: parade-bob 0.42s ease-in-out infinite alternate;
+}
+
+.parade-swing-a,
+.parade-swing-b {
+  transform-origin: 50% 0;
+  transform-box: fill-box;
+  animation: parade-swing 0.42s ease-in-out infinite alternate;
+}
+
+.parade-swing-b {
+  animation-direction: alternate-reverse;
+}
+
+@keyframes parade-stroll {
+  0% {
+    transform: translateX(0);
+  }
+  46%,
+  50% {
+    transform: translateX(var(--range));
+  }
+  96%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes parade-face {
+  0% {
+    transform: scaleX(1);
+  }
+  48% {
+    transform: scaleX(-1);
+  }
+  98% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes parade-bob {
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes parade-swing {
+  from {
+    transform: rotate(-16deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rise-in,
-  .motion-caption {
+  .motion-caption,
+  .parade-walker,
+  .parade-facing,
+  .parade-bob,
+  .parade-swing-a,
+  .parade-swing-b {
     animation: none;
   }
 }
