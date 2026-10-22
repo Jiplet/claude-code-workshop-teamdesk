@@ -29,6 +29,8 @@ A request goes route component, then tRPC router (`apps/web/src/server/trpc/rout
 - `bun run fix`: format and apply safe lint fixes.
 - `bun run build`: production build.
 - `bun run deploy`: build and deploy with wrangler. Needs a Cloudflare login and a real D1 database id in `apps/web/wrangler.jsonc`.
+- `bun run db:apply` / `bun run db:apply:remote`: apply the D1 migrations to the local or the deployed database.
+- `bun run db:seed` / `bun run db:seed:remote`: load the demo data into the local or the deployed database.
 
 ## Stack
 

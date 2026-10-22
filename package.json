@@ -10,6 +10,10 @@
   "scripts": {
     "build": "turbo run build",
     "check": "ultracite check && turbo run typecheck",
+    "db:apply": "bun run --filter web db:apply",
+    "db:apply:remote": "bun run --filter web db:apply:remote",
+    "db:seed": "bun run --filter web db:seed",
+    "db:seed:remote": "bun run --filter web db:seed:remote",
     "deploy": "turbo run deploy",
     "dev": "turbo run dev",
     "fix": "ultracite fix",

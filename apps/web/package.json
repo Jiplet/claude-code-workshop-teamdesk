@@ -8,8 +8,12 @@
   "scripts": {
     "build": "vite build",
     "cf-typegen": "wrangler types",
+    "db:apply": "wrangler d1 migrations apply DB --local",
+    "db:apply:remote": "wrangler d1 migrations apply DB --remote",
+    "db:seed": "wrangler d1 execute DB --local --file ../../packages/db/seed.sql",
+    "db:seed:remote": "wrangler d1 execute DB --remote --file ../../packages/db/seed.sql",
     "deploy": "bun run build && wrangler deploy",
-    "dev": "wrangler d1 migrations apply DB --local && wrangler d1 execute DB --local --file ../../packages/db/seed.sql && vite dev --port 3000",
+    "dev": "bun run db:apply && bun run db:seed && vite dev --port 3000",
     "generate-routes": "tsr generate",
     "preview": "vite preview",
     "test": "bun test src",

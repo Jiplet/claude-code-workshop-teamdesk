@@ -45,12 +45,15 @@ The database needs no configuration for local work.
 
 ## Build & deploy
 
-The local database only exists on your machine, so the deployed Worker needs a real D1 database. Create one, put the id it prints into `d1_databases[0].database_id` in `wrangler.jsonc`, and create the tables:
+The local database only exists on your machine, so the deployed Worker needs a real D1 database. Create one, put the id it prints into `d1_databases[0].database_id` in `wrangler.jsonc`, then create the tables and load the demo data:
 
 ```bash
 bunx wrangler d1 create teamdesk
-bunx wrangler d1 migrations apply DB --remote
+bun run db:apply:remote   # apply the migrations to the remote database
+bun run db:seed:remote    # load packages/db/seed.sql (safe to re-run)
 ```
+
+Without the demo data the deployed app has no members, so nobody can book. `bun run db:apply` and `bun run db:seed` do the same for the local database; `bun run dev` runs both before it starts.
 
 Then:
 
