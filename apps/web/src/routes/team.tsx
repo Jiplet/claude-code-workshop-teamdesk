@@ -8,6 +8,7 @@ import { type FormEvent, useCallback, useMemo } from "react";
 import AnnouncementList from "#/components/announcement-list";
 import FormError from "#/components/form-error";
 import MemberPicker from "#/components/member-picker";
+import MinifigHead from "#/components/minifig-head";
 import PageError from "#/components/page-error";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
@@ -109,12 +110,24 @@ function TeamPage() {
         <h2 className="mb-4 font-heading text-2xl text-foreground">Members</h2>
         <ul className="m-0 list-none space-y-4 p-0">
           {members.map((member) => (
-            <li className="border-border border-t pt-4" key={member.id}>
-              <p className="m-0 font-semibold text-foreground">{member.name}</p>
-              <p className="m-0 text-muted-foreground text-sm">
-                {member.email}, {member.role}, joined{" "}
-                {formatUtc(member.joinedAt).slice(0, 10)}
-              </p>
+            <li
+              className="flex items-center gap-4 border-border border-t pt-4"
+              key={member.id}
+            >
+              <MinifigHead
+                className="size-14 flex-shrink-0"
+                name={member.name}
+                seed={member.id}
+              />
+              <div className="min-w-0">
+                <p className="m-0 font-semibold text-foreground">
+                  {member.name}
+                </p>
+                <p className="m-0 text-muted-foreground text-sm">
+                  {member.email}, {member.role}, joined{" "}
+                  {formatUtc(member.joinedAt).slice(0, 10)}
+                </p>
+              </div>
             </li>
           ))}
         </ul>
