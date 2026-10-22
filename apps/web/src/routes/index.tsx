@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { HeroMotion } from "#/components/hero-motion";
 import { Button } from "#/components/ui/button";
 
 export const Route = createFileRoute("/")({ component: App });
@@ -34,18 +35,23 @@ const pages = [
 function App() {
   return (
     <main className="page-wrap px-4 pt-14 pb-8">
-      <section className="rise-in pt-6 pb-4 sm:pt-10">
-        <p className="island-kicker mb-4">Teamdesk</p>
-        <h1 className="display-title mb-5 max-w-3xl text-5xl text-foreground leading-[1.05] sm:text-6xl">
-          Rooms, bookings and tasks for a small team.
-        </h1>
-        <p className="mb-8 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          One place to book a meeting room, share announcements and keep track
-          of who is doing what.
-        </p>
-        <Button asChild>
-          <Link to="/bookings">Book a room</Link>
-        </Button>
+      <section className="grid items-center gap-10 pt-6 pb-4 sm:pt-10 lg:grid-cols-[1.05fr_1fr]">
+        <div className="rise-in">
+          <p className="island-kicker mb-4">Teamdesk</p>
+          <h1 className="display-title mb-5 max-w-3xl text-5xl text-foreground leading-[1.05] sm:text-6xl">
+            Rooms, bookings and tasks for a small team.
+          </h1>
+          <p className="mb-8 max-w-2xl text-base text-muted-foreground sm:text-lg">
+            One place to book a meeting room, share announcements and keep track
+            of who is doing what.
+          </p>
+          <Button asChild>
+            <Link to="/bookings">Book a room</Link>
+          </Button>
+        </div>
+        <div className="rise-in" style={{ animationDelay: "160ms" }}>
+          <HeroMotion />
+        </div>
       </section>
 
       <section className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">

@@ -244,6 +244,24 @@ body {
   animation: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* The front page showreel caption: each scene's line blurs up into place. */
+.motion-caption {
+  animation: motion-caption 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes motion-caption {
+  from {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -256,7 +274,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise-in {
+  .rise-in,
+  .motion-caption {
     animation: none;
   }
 }
