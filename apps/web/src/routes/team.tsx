@@ -10,7 +10,7 @@ import FormError from "#/components/form-error";
 import MemberPicker from "#/components/member-picker";
 import MinifigHead from "#/components/minifig-head";
 import PageError from "#/components/page-error";
-import TeamParade from "#/components/team-parade";
+import TeamUniverse from "#/components/team-universe";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Kbd, KbdGroup } from "#/components/ui/kbd";
@@ -93,22 +93,26 @@ function TeamPage() {
 
   return (
     <main className="page-wrap px-4 py-12">
-      <div className="relative">
-        <TeamParade members={members} />
-        <section className="relative flex max-w-3xl flex-col gap-4">
-          <p className="island-kicker m-0">Teamdesk</p>
-          <h1 className="display-title m-0 text-4xl text-foreground sm:text-5xl">
+      <div className="relative h-80 overflow-hidden rounded-3xl bg-[#05060d] ring-1 ring-white/10 sm:h-96">
+        <TeamUniverse members={members} />
+        <section className="pointer-events-none relative flex max-w-md flex-col gap-3 p-6 sm:p-10">
+          <p className="m-0 font-semibold text-[#6fb2bd] text-xs uppercase tracking-[0.2em]">
+            Teamdesk
+          </p>
+          <h1 className="display-title m-0 text-4xl text-white sm:text-5xl">
             Team
           </h1>
-          <p className="m-0 text-base text-muted-foreground leading-8">
+          <p className="m-0 text-base text-white/70 leading-7">
             Who is on the team and what they need to know.
           </p>
-          <MemberPicker
-            members={members}
-            onChange={setActingMemberId}
-            value={actingMember?.id}
-          />
         </section>
+      </div>
+      <div className="mt-6">
+        <MemberPicker
+          members={members}
+          onChange={setActingMemberId}
+          value={actingMember?.id}
+        />
       </div>
 
       <section className="mt-10">

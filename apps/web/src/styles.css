@@ -342,77 +342,136 @@ body {
   }
 }
 
-/* Team page parade: each walker strolls out, pauses, turns and strolls back.
-   --stroll, --range and --delay are set per member. Limbs swing in pairs and
-   the body bobs once per step. */
-.parade-walker {
-  position: absolute;
-  animation: parade-stroll var(--stroll) ease-in-out var(--delay) infinite;
+/* Team page universe, animated like a brickfilm: every move steps at about
+   12 frames a second (steps() per keyframe segment) instead of easing, and
+   .universe-boil shifts the whole set a fraction of a pixel between frames. */
+.universe-boil {
+  animation: universe-boil 0.5s steps(1) infinite;
 }
 
-.parade-facing {
-  animation: parade-face var(--stroll) step-end var(--delay) infinite;
+.universe-twinkle {
+  animation: universe-twinkle 1.6s steps(1) infinite;
 }
 
-/* A forward lean shows which way a front-facing figure is walking. */
-.parade-lean {
-  transform: rotate(5deg);
-  transform-origin: 50% 100%;
+.universe-capital {
+  animation: universe-capital 60s steps(360) infinite;
 }
 
-.parade-bob {
-  animation: parade-bob 0.42s ease-in-out infinite alternate;
+.universe-engine {
+  animation: universe-engine 0.33s steps(1) infinite;
 }
 
-.parade-swing-a,
-.parade-swing-b {
+.universe-pilot {
+  animation: universe-flight var(--flight) steps(24) var(--delay) infinite;
+}
+
+.universe-bolt {
+  animation: universe-bolt 1.2s steps(6) infinite;
+}
+
+.universe-swing {
   transform-origin: 50% 0;
   transform-box: fill-box;
-  animation: parade-swing 0.42s ease-in-out infinite alternate;
+  animation: universe-swing 2.4s steps(5) infinite;
 }
 
-.parade-swing-b {
-  animation-direction: alternate-reverse;
+.universe-blade {
+  transform-origin: 50% 100%;
+  transform-box: fill-box;
+  animation: universe-ignite 0.5s steps(4) both;
 }
 
-@keyframes parade-stroll {
+.universe-facing-left .universe-figure {
+  transform: scaleX(-1);
+}
+
+@keyframes universe-boil {
   0% {
-    transform: translateX(0);
+    transform: translate(0, 0);
   }
-  46%,
+  25% {
+    transform: translate(0.5px, -0.4px);
+  }
   50% {
-    transform: translateX(var(--range));
+    transform: translate(-0.4px, 0.3px);
   }
-  96%,
+  75% {
+    transform: translate(0.3px, 0.5px);
+  }
+}
+
+@keyframes universe-twinkle {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes universe-capital {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(230%);
+  }
+}
+
+@keyframes universe-engine {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes universe-flight {
+  0% {
+    left: -20%;
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: translateY(-26px) rotate(-6deg);
+  }
+  70% {
+    transform: translateY(18px) rotate(5deg);
+  }
   100% {
+    left: 110%;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes universe-bolt {
+  0% {
+    opacity: 1;
     transform: translateX(0);
   }
-}
-
-@keyframes parade-face {
-  0% {
-    transform: scaleX(1);
-  }
-  48% {
-    transform: scaleX(-1);
-  }
-  98% {
-    transform: scaleX(1);
+  60%,
+  100% {
+    opacity: 0;
+    transform: translateX(140px);
   }
 }
 
-@keyframes parade-bob {
-  to {
-    transform: translateY(-3px);
+@keyframes universe-swing {
+  0%,
+  100% {
+    transform: rotate(-20deg);
+  }
+  30% {
+    transform: rotate(40deg);
+  }
+  50% {
+    transform: rotate(-45deg);
+  }
+  75% {
+    transform: rotate(15deg);
   }
 }
 
-@keyframes parade-swing {
+@keyframes universe-ignite {
   from {
-    transform: rotate(-16deg);
+    transform: scaleY(0);
   }
   to {
-    transform: rotate(16deg);
+    transform: scaleY(1);
   }
 }
 
@@ -425,11 +484,14 @@ body {
   .motion-caption,
   .about-sweep,
   .about-word,
-  .parade-walker,
-  .parade-facing,
-  .parade-bob,
-  .parade-swing-a,
-  .parade-swing-b {
+  .universe-boil,
+  .universe-twinkle,
+  .universe-capital,
+  .universe-engine,
+  .universe-pilot,
+  .universe-bolt,
+  .universe-swing,
+  .universe-blade {
     animation: none;
   }
 }
