@@ -1,6 +1,7 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import BrandHeader from "#/components/brand-header";
 import { TooltipProvider } from "#/components/ui/tooltip";
 import Footer from "../components/footer";
 import Header from "../components/header";
@@ -44,6 +45,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex min-h-dvh flex-col font-sans antialiased [overflow-wrap:anywhere] selection:bg-primary/30">
         <TooltipProvider>
+          <BrandHeader />
           <Header />
           {/* flex-1 pushes the footer to the bottom on short pages. */}
           <div className="flex-1 pb-20">{children}</div>

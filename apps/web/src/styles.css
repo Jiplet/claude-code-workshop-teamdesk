@@ -50,18 +50,19 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Brand core from docs/image.png - constant across themes. One accent only:
-   terracotta. Everything else is warm paper and ink. */
+/* Brand core from the Jacob Ooi header - constant across themes. One accent
+   only: teal. Everything else is ink and slate on white. */
 :root {
-  --brand-terracotta: oklch(0.6724 0.1308 38.76); /* #d97757 */
-  --brand-paper: oklch(0.9818 0.0054 95.1); /* #faf9f5 */
-  --brand-ink: oklch(0.209 0 0); /* #181818 */
+  --brand-teal: oklch(0.5592 0.0734 209.97); /* #38808c, 4.53:1 on white */
+  --brand-paper: oklch(1 0 0); /* #ffffff */
+  --brand-ink: oklch(0.2246 0.0074 248.16); /* #191c1f */
+  --brand-slate: oklch(0.5002 0.0089 241.8); /* #5f6468 */
 
   --radius: 0.75rem;
 }
 
-/* Light is the reference surface: ink on warm paper, hairline dividers, and
-   terracotta for fills and labels. */
+/* Light is the reference surface: ink on white, hairline dividers, and teal
+   for fills, links and labels. */
 :root,
 .light {
   --background: var(--brand-paper);
@@ -70,75 +71,71 @@
   --card-foreground: var(--brand-ink);
   --popover: oklch(1 0 0);
   --popover-foreground: var(--brand-ink);
-  --primary: var(--brand-terracotta);
-  --primary-foreground: var(
-    --brand-ink
-  ); /* white on terracotta is only 3.1:1 */
-  --secondary: oklch(0.9457 0.0096 93.57); /* #efede6 */
+  --primary: var(--brand-teal);
+  --primary-foreground: var(--brand-paper);
+  --secondary: oklch(0.9682 0.0035 219.53); /* #f2f5f6 */
   --secondary-foreground: var(--brand-ink);
-  --muted: oklch(0.9457 0.0096 93.57);
-  --muted-foreground: oklch(
-    0.5181 0.01 84.59
-  ); /* #6b6862, image's #8a8681 fails AA */
-  --accent: oklch(0.9457 0.0096 93.57);
+  --muted: oklch(0.9682 0.0035 219.53);
+  --muted-foreground: var(--brand-slate);
+  --accent: oklch(0.9682 0.0035 219.53);
   --accent-foreground: var(--brand-ink);
   --destructive: oklch(0.5289 0.1661 28.5); /* #b8382e */
-  --border: oklch(0.9088 0.0123 96.43); /* #e3e1d8 divider */
-  --input: oklch(0.9088 0.0123 96.43);
-  --ring: var(--brand-terracotta);
-  --chart-1: var(--brand-terracotta);
+  --border: oklch(0.9118 0.007 219.56); /* #dde3e5 divider */
+  --input: oklch(0.9118 0.007 219.56);
+  --ring: var(--brand-teal);
+  --chart-1: var(--brand-teal);
   --chart-2: var(--brand-ink);
-  --chart-3: oklch(0.3791 0 0); /* #424242 */
-  --chart-4: oklch(0.622 0.0088 73.7); /* #8a8681 */
-  --chart-5: oklch(0.9088 0.0123 96.43);
+  --chart-3: var(--brand-slate);
+  --chart-4: oklch(0.7229 0.0698 208.95); /* #6fb2bd */
+  --chart-5: oklch(0.9118 0.007 219.56);
   --sidebar: var(--brand-paper);
   --sidebar-foreground: var(--brand-ink);
-  --sidebar-primary: var(--brand-terracotta);
-  --sidebar-primary-foreground: var(--brand-ink);
-  --sidebar-accent: oklch(0.9457 0.0096 93.57);
+  --sidebar-primary: var(--brand-teal);
+  --sidebar-primary-foreground: var(--brand-paper);
+  --sidebar-accent: oklch(0.9682 0.0035 219.53);
   --sidebar-accent-foreground: var(--brand-ink);
-  --sidebar-border: oklch(0.9088 0.0123 96.43);
-  --sidebar-ring: var(--brand-terracotta);
+  --sidebar-border: oklch(0.9118 0.007 219.56);
+  --sidebar-ring: var(--brand-teal);
 
-  /* Terracotta text needs a darker step to pass AA on paper. */
-  --brand-label: oklch(0.5585 0.1322 38.91); /* #b35434 */
+  /* Small teal text gets a darker step for margin above AA. */
+  --brand-label: oklch(0.4985 0.0661 210.68); /* #2e6d78, 5.87:1 */
 }
 
-/* Dark variant: the same hues with paper and ink swapped. */
+/* Dark variant: ink surface, lighter teal so text keeps its contrast. */
 .dark {
   --background: var(--brand-ink);
   --foreground: var(--brand-paper);
-  --card: oklch(0.2485 0.0024 67.72); /* #222120 */
+  --card: oklch(0.2625 0.011 254.03); /* #21252a */
   --card-foreground: var(--brand-paper);
-  --popover: oklch(0.2485 0.0024 67.72);
+  --popover: oklch(0.2625 0.011 254.03);
   --popover-foreground: var(--brand-paper);
-  --primary: var(--brand-terracotta);
+  --primary: oklch(0.7229 0.0698 208.95); /* #6fb2bd, 7.15:1 with ink */
   --primary-foreground: var(--brand-ink);
-  --secondary: oklch(0.2894 0.0039 84.58); /* #2c2b29 */
+  --secondary: oklch(0.3023 0.0114 248.21); /* #2a2f34 */
   --secondary-foreground: var(--brand-paper);
-  --muted: oklch(0.2894 0.0039 84.58);
-  --muted-foreground: oklch(0.6973 0.0111 81.79); /* #a19d96 */
-  --accent: oklch(0.2894 0.0039 84.58);
+  --muted: oklch(0.3023 0.0114 248.21);
+  --muted-foreground: oklch(0.7343 0.0118 243.71); /* #a3aab0 */
+  --accent: oklch(0.3023 0.0114 248.21);
   --accent-foreground: var(--brand-paper);
   --destructive: oklch(0.6683 0.1574 28.93); /* #e5695a */
-  --border: oklch(0.3417 0.0059 78.25); /* #3a3835 */
-  --input: oklch(0.3417 0.0059 78.25);
-  --ring: var(--brand-terracotta);
-  --chart-1: var(--brand-terracotta);
+  --border: oklch(0.3529 0.0132 248.2); /* #363c42 */
+  --input: oklch(0.3529 0.0132 248.2);
+  --ring: oklch(0.7229 0.0698 208.95);
+  --chart-1: oklch(0.7229 0.0698 208.95);
   --chart-2: var(--brand-paper);
-  --chart-3: oklch(0.6973 0.0111 81.79);
-  --chart-4: oklch(0.5181 0.01 84.59);
-  --chart-5: oklch(0.3417 0.0059 78.25);
+  --chart-3: oklch(0.7343 0.0118 243.71);
+  --chart-4: var(--brand-teal);
+  --chart-5: oklch(0.3529 0.0132 248.2);
   --sidebar: var(--brand-ink);
   --sidebar-foreground: var(--brand-paper);
-  --sidebar-primary: var(--brand-terracotta);
+  --sidebar-primary: oklch(0.7229 0.0698 208.95);
   --sidebar-primary-foreground: var(--brand-ink);
-  --sidebar-accent: oklch(0.2894 0.0039 84.58);
+  --sidebar-accent: oklch(0.3023 0.0114 248.21);
   --sidebar-accent-foreground: var(--brand-paper);
-  --sidebar-border: oklch(0.3417 0.0059 78.25);
-  --sidebar-ring: var(--brand-terracotta);
+  --sidebar-border: oklch(0.3529 0.0132 248.2);
+  --sidebar-ring: oklch(0.7229 0.0698 208.95);
 
-  --brand-label: oklch(0.7187 0.1122 39.57); /* #e08b6e */
+  --brand-label: oklch(0.7229 0.0698 208.95); /* #6fb2bd */
 }
 
 @layer base {
@@ -192,7 +189,7 @@ body {
   border-radius: var(--radius-2xl);
 }
 
-/* Eyebrow label: small terracotta text above a heading. */
+/* Eyebrow label: small teal text above a heading. */
 .island-kicker {
   font-size: 0.8125rem;
   font-weight: 600;
@@ -217,7 +214,7 @@ body {
   width: 100%;
   height: 1px;
   content: "";
-  background: var(--brand-terracotta);
+  background: var(--primary);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 170ms ease;
