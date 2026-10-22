@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
+  formatLocalTime,
   formatUtc,
   formatUtcRange,
   formatUtcTime,
   isoFromDayAndTime,
+  localDayBounds,
   todayUtc,
 } from "./datetime.ts";
 
@@ -40,5 +42,20 @@ describe("datetime", () => {
 
   test("isoFromDayAndTime rejects a bad time", () => {
     expect(() => isoFromDayAndTime("2026-10-20", "25:00")).toThrow();
+  });
+
+  test("localDayBounds spans the local day and names its date", () => {
+    const { dayEnd, dayStart, today } = localDayBounds(
+      new Date(2026, 9, 23, 15, 45)
+    );
+    expect(new Date(dayStart).getTime()).toBe(new Date(2026, 9, 23).getTime());
+    expect(new Date(dayEnd).getTime()).toBe(new Date(2026, 9, 24).getTime());
+    expect(today).toBe("2026-10-23");
+  });
+
+  test("formatLocalTime shows local HH:MM", () => {
+    expect(formatLocalTime(new Date(2026, 9, 23, 7, 5).toISOString())).toBe(
+      "07:05"
+    );
   });
 });

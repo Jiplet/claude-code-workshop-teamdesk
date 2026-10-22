@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BookingsRouteImport } from './routes/bookings'
+import { Route as MyDayRouteImport } from './routes/my-day'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as TasksRouteImport } from './routes/tasks'
@@ -30,6 +31,11 @@ const AboutRoute = AboutRouteImport.update({
 const BookingsRoute = BookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyDayRoute = MyDayRouteImport.update({
+  id: '/my-day',
+  path: '/my-day',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesRoute = NotesRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bookings': typeof BookingsRoute
+  '/my-day': typeof MyDayRoute
   '/notes': typeof NotesRoute
   '/rooms': typeof RoomsRoute
   '/tasks': typeof TasksRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bookings': typeof BookingsRoute
+  '/my-day': typeof MyDayRoute
   '/notes': typeof NotesRoute
   '/rooms': typeof RoomsRoute
   '/tasks': typeof TasksRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bookings': typeof BookingsRoute
+  '/my-day': typeof MyDayRoute
   '/notes': typeof NotesRoute
   '/rooms': typeof RoomsRoute
   '/tasks': typeof TasksRoute
@@ -84,14 +93,30 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/bookings' | '/notes' | '/rooms' | '/tasks' | '/team'
+    | '/'
+    | '/about'
+    | '/bookings'
+    | '/my-day'
+    | '/notes'
+    | '/rooms'
+    | '/tasks'
+    | '/team'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/bookings' | '/notes' | '/rooms' | '/tasks' | '/team'
+  to:
+    | '/'
+    | '/about'
+    | '/bookings'
+    | '/my-day'
+    | '/notes'
+    | '/rooms'
+    | '/tasks'
+    | '/team'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/bookings'
+    | '/my-day'
     | '/notes'
     | '/rooms'
     | '/tasks'
@@ -102,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BookingsRoute: typeof BookingsRoute
+  MyDayRoute: typeof MyDayRoute
   NotesRoute: typeof NotesRoute
   RoomsRoute: typeof RoomsRoute
   TasksRoute: typeof TasksRoute
@@ -129,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/bookings'
       preLoaderRoute: typeof BookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-day': {
+      id: '/my-day'
+      path: '/my-day'
+      fullPath: '/my-day'
+      preLoaderRoute: typeof MyDayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes': {
@@ -166,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BookingsRoute: BookingsRoute,
+  MyDayRoute: MyDayRoute,
   NotesRoute: NotesRoute,
   RoomsRoute: RoomsRoute,
   TasksRoute: TasksRoute,

@@ -65,6 +65,13 @@ export default function Header() {
           >
             Tasks
           </Link>
+          <Link
+            activeProps={{ className: "nav-link is-active" }}
+            className="nav-link"
+            to="/my-day"
+          >
+            My day
+          </Link>
           <a
             className="nav-link"
             href="https://tanstack.com/start/latest/docs/framework/react/overview"

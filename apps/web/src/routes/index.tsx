@@ -24,6 +24,11 @@ const pages = [
     title: "Tasks",
     to: "/tasks",
   },
+  {
+    description: "Your bookings today and the tasks you need to finish.",
+    title: "My day",
+    to: "/my-day",
+  },
 ] as const;
 
 function App() {
@@ -43,7 +48,7 @@ function App() {
         </Button>
       </section>
 
-      <section className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
         {pages.map(({ description, title, to }, index) => (
           <article
             className="rise-in border-border border-t pt-5"
