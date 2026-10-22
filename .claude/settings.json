@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun test)",
+      "Bash(bun test:*)",
+      "Bash(bun run check)",
+      "Bash(bun run fix)",
+      "Bash(bun run dev)",
+      "Bash(bunx wrangler d1:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote -v)",
+      "Bash(git blame:*)"
+    ]
+  }
+}
