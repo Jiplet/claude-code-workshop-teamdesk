@@ -1,10 +1,10 @@
-import { TASK_TITLE_MAX_LENGTH } from "@repo/db/shared";
+import { TASK_TITLE_MAX_LENGTH, type TaskStatus } from "@repo/db/shared";
 import { createFileRoute } from "@tanstack/react-router";
-import { type FormEvent, useCallback } from "react";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
 import FormError from "#/components/form-error";
 import MemberPicker from "#/components/member-picker";
 import PageError from "#/components/page-error";
-import TaskList from "#/components/task-list";
+import TaskBoard from "#/components/task-board";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import {
@@ -14,6 +14,7 @@ import {
 import { useActingMember } from "#/hooks/use-acting-member";
 import { useAction } from "#/hooks/use-action";
 import { getTrpc } from "#/integrations/trpc/client";
+import { localDayBounds } from "#/lib/datetime";
 
 export const Route = createFileRoute("/tasks")({
   loader: async () => {
@@ -34,6 +35,10 @@ function TasksPage() {
   const createTask = useAction();
   const updateTask = useAction();
   const actorId = actingMember?.id ?? "";
+  // The viewer's date marks overdue cards. It is set after hydration because
+  // the server renders in UTC.
+  const [today, setToday] = useState("");
+  useEffect(() => setToday(localDayBounds().today), []);
 
   const handleCreate = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -57,10 +62,10 @@ function TasksPage() {
     [actorId, createTask.run]
   );
 
-  const handleComplete = useCallback(
-    (taskId: string) =>
+  const handleMove = useCallback(
+    (taskId: string, status: TaskStatus) =>
       updateTask.run(() =>
-        getTrpc().tasks.complete.mutate({ actorId, taskId })
+        getTrpc().tasks.move.mutate({ actorId, status, taskId })
       ),
     [actorId, updateTask.run]
   );
@@ -81,7 +86,7 @@ function TasksPage() {
           Tasks
         </h1>
         <p className="m-0 text-base text-muted-foreground leading-8">
-          Shared jobs for the team. Hand them out and tick them off.
+          Shared jobs for the team. Drag a card along as the work moves.
         </p>
         <MemberPicker
           members={members}
@@ -123,12 +128,13 @@ function TasksPage() {
 
       <section className="mt-10">
         <FormError message={updateTask.error} />
-        <TaskList
+        <TaskBoard
           disabled={updateTask.pending}
           members={members}
           onAssign={handleAssign}
-          onComplete={handleComplete}
+          onMove={handleMove}
           tasks={tasks}
+          today={today}
         />
       </section>
     </main>
