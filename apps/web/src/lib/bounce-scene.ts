@@ -1,6 +1,7 @@
 import {
   ACESFilmicToneMapping,
   AmbientLight,
+  Box3,
   BoxGeometry,
   BufferGeometry,
   CanvasTexture,
@@ -302,14 +303,35 @@ export function startBounceScene(
   for (const actor of actors) {
     stage.add(actor.group);
   }
-  const span = Math.max(actors.length - 1, 1);
   scene.add(stage);
-  // Wide panels keep the staircase right of the title; narrow ones drop it
-  // below the text. The orb's landing spots follow the stage.
+  // Fits the whole staircase, names included, into a target box on screen,
+  // however many members there are: right of the title on wide panels, below
+  // it on narrow ones. Box edges are in normalised device coordinates (-1 to
+  // 1). The camera looks straight down -z, so the visible half-height at the
+  // stage is distance * tan(fov / 2). The orb's landing spots follow.
   const frameStage = (narrow: boolean) => {
+    const target = narrow
+      ? { bottom: -0.94, left: -0.9, right: 0.9, top: 0.12 }
+      : { bottom: -0.86, left: -0.12, right: 0.94, top: 0.8 };
+    stage.position.set(0, 0, 0);
+    stage.updateMatrixWorld(true);
+    const box = new Box3().setFromObject(stage);
+    const size = box.getSize(new Vector3());
+    const centre = box.getCenter(new Vector3());
+    const slope = Math.tan((camera.fov * Math.PI) / 360);
+    const distance =
+      Math.max(
+        size.x / ((target.right - target.left) * slope * camera.aspect),
+        size.y / ((target.top - target.bottom) * slope)
+      ) *
+        1.06 +
+      box.max.z;
+    camera.position.set(0, 0, distance);
+    const halfHeight = (distance - box.max.z) * slope;
     stage.position.set(
-      -span * 0.75 + (narrow ? 0.6 : 3.2),
-      span * 0.42 - (narrow ? 1.6 : 0.2),
+      ((target.left + target.right) / 2) * halfHeight * camera.aspect -
+        centre.x,
+      ((target.top + target.bottom) / 2) * halfHeight - centre.y,
       0
     );
     stage.updateMatrixWorld(true);
@@ -356,11 +378,8 @@ export function startBounceScene(
     renderer.setSize(width, height, false);
     composer.setSize(width, height);
     camera.aspect = width / height;
-    // Narrow screens pull the camera back so the whole staircase fits.
-    const narrow = width < 640;
-    camera.position.set(0, 0.6, narrow ? 13 : 9.5);
-    frameStage(narrow);
     camera.updateProjectionMatrix();
+    frameStage(width < 640);
   };
   resize();
   const resizeObserver = new ResizeObserver(resize);
@@ -448,11 +467,8 @@ export function startBounceScene(
       actor.head.rotation.y += (turn * 0.8 - actor.head.rotation.y) * 0.12;
     }
 
-    camera.lookAt(
-      0.3 + Math.sin(elapsed * 0.25) * 0.4,
-      0.2 + (ball.position.y - (actors[0]?.spot.y ?? 0)) * 0.04,
-      0
-    );
+    // A slow sway, small enough to keep the fitted framing.
+    camera.lookAt(Math.sin(elapsed * 0.25) * 0.12, 0, 0);
     composer.render();
     frame = visible ? requestAnimationFrame(render) : 0;
   };
